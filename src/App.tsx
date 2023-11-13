@@ -1,39 +1,67 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+import { useRef, useEffect } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+
+const panelStyles = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
 
 function App() {
-  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) {
+      return;
+    }
+
+    const observer = new ResizeObserver((entries) => {
+      entries.forEach((entry) => {
+        console.log(entry.contentRect.width);
+      });
+    });
+
+    observer.observe(ref.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-      </div>
-      <h1>React + Vite</h1>
-      <h2>On CodeSandbox!</h2>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR.
-        </p>
-
-        <p>
-          Tip: you can use the inspector button next to address bar to click on
-          components in the preview and open the code in the editor!
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+    <PanelGroup
+      direction="horizontal"
+      style={{ width: "90vw", height: "90vh", backgroundColor: "lightblue" }}
+    >
+      <Panel
+        minSizePixels={200}
+        maxSizePixels={200}
+        style={panelStyles}
+        collapsible
+      >
+        left
+      </Panel>
+      <PanelResizeHandle
+        style={{ width: "1rem", backgroundColor: "lightgreen" }}
+      />
+      <Panel style={panelStyles}>center</Panel>
+      <PanelResizeHandle
+        style={{ width: "1rem", backgroundColor: "lightgreen" }}
+      />
+      <Panel
+        minSizePixels={200}
+        maxSizePixels={200}
+        style={panelStyles}
+        collapsible
+      >
+        <div
+          ref={ref}
+          style={{ width: "100%", height: "100%", ...panelStyles }}
+        >
+          right
+        </div>
+      </Panel>
+    </PanelGroup>
   );
 }
 
